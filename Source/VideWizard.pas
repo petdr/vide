@@ -49,8 +49,8 @@ var
   ScanCode: Word;
   Shift: TShiftState;
   Chars: array[1..2] of WideChar;
-  ToAsciiResult: Integer;
-  keyState: TKeyboardState;
+  NumChars: Integer;
+  KeyState: TKeyboardState;
   i: Integer;
 begin
   if (Msg.message = WM_KEYDOWN) and IsEditControl(Screen.ActiveControl) then
@@ -59,12 +59,17 @@ begin
     ScanCode := (Msg.lParam and $00FF0000) shr 16;
     Shift := KeyDataToShiftState(Msg.lParam);
 
-    GetKeyboardState(keyState);
-    ToAsciiResult := ToAscii(Key, ScanCode, keystate, @Chars, 0);
-
-    for i := 1 to ToAsciiResult do
+    // If we've pressed ctrl or alt then we don't want to translate
+    // the keyboard state into a character.
+    if not ((ssCtrl in Shift) or (ssAlt in Shift)) then
     begin
-      ShowMessage(Chars[i]);
+      GetKeyboardState(keyState);
+      NumChars := ToUnicode(Key, ScanCode, KeyState, @Chars, 2, 0);
+
+      for i := 1 to NumChars do
+      begin
+        ShowMessage(Chars[i]);
+      end;
     end;
   end;
 end;
