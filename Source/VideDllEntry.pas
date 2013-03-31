@@ -48,7 +48,7 @@ begin
     Terminate := FinalizeWizard;
     WizardServices := BorlandIDEServices as IOTAWizardServices;
     Assert(Assigned(WizardServices));
-    VideWiz := THelloWizard.Create;
+    VideWiz := TVIDEWizard.Create;
     FWizardIndex := WizardServices.AddWizard(VideWiz as IOTAWizard);
     Result := (FWizardIndex >= 0);
   end;
