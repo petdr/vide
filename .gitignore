@@ -3,8 +3,11 @@
 *.local
 *.identcache
 __history
+__recovery
 *.drc
 *.map
 *.exe
 *.dll
+*.dsk
+*.res
 bin/*
