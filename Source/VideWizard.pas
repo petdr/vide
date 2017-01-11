@@ -55,10 +55,6 @@ var
   Key: Word;
   ScanCode: Word;
   Shift: TShiftState;
-  Chars: array[1..2] of WideChar;
-  NumChars: Integer;
-  KeyState: TKeyboardState;
-  i: Integer;
 begin
   if ((Msg.message = WM_KEYDOWN) or (Msg.message = WM_KEYUP) or (Msg.message = WM_CHAR)) and
     IsEditControl(Screen.ActiveControl) then
