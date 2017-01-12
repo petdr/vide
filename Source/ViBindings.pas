@@ -42,7 +42,7 @@ type
     FRegisterArray: array[0..255] of TViRegister;
 
     function GetCount: Integer;
-    function ResetCount: Integer;
+    procedure ResetCount;
     procedure UpdateCount(key: Char);
     function GetPositionForMove(key: Char; count: Integer): TOTAEditPos;
     function IsMovementKey(key: Char): Boolean;
@@ -131,13 +131,10 @@ end;
 procedure TViBindings.EditChar(Key, ScanCode: Word; Shift: TShiftState; Msg: TMsg; var Handled: Boolean);
 var
   c: Char;
-  editChar: Char;
   EditPosition: IOTAEditPosition;
   EditBlock: IOTAEditBlock;
   Pos: TOTAEditPos;
   count: Integer;
-  searchText: String;
-  error: Integer;
   i: Integer;
 
   procedure DeleteBlock(IsLine: Boolean);
@@ -234,7 +231,7 @@ begin
       end;
       ResetCount;
     end
-    else if (c in ['0'..'9']) then
+    else if CharInSet(c, ['0'..'9']) then
     begin
       UpdateCount(c);
     end
@@ -489,21 +486,14 @@ begin
 end;
 
 function TViBindings.IsMovementKey(key: Char): Boolean;
-var
-  movementSet: set of Char;
 begin
   if (key = '0') and FParsingNumber then
-  begin
-    Result:= False;
-  end
+    Result:= False
   else
-  begin
-    movementSet := ['0', '$', 'b', 'B', 'e', 'E', 'h', 'j', 'k', 'l', 'w', 'W'];
-    Result := key in movementSet;
-  end;
+    Result := CharInSet(key, ['0', '$', 'b', 'B', 'e', 'E', 'h', 'j', 'k', 'l', 'w', 'W']);
 end;
 
-function TViBindings.ResetCount: Integer;
+procedure TViBindings.ResetCount;
 begin
   FCount := 0;
   FParsingNumber := False;
@@ -512,7 +502,7 @@ end;
 procedure TViBindings.UpdateCount(key: Char);
 begin
   FParsingNumber := True;
-  if (key in ['0'..'9']) then
+  if CharInSet(key, ['0'..'9']) then
     FCount := 10 * FCount + (Ord(key) - Ord('0'));
 end;
 
