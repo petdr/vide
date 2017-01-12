@@ -33,14 +33,10 @@ type
     FEditCount: Integer;
     FCount: Integer;
     FSelectedRegister: Integer;
-
     FPreviousAction: TViAction;
-
     FInsertText: String;
-
     FMarkArray: array[0..255] of TOTAEditPos;
     FRegisterArray: array[0..255] of TViRegister;
-
     function GetCount: Integer;
     procedure ResetCount;
     procedure UpdateCount(key: Char);
@@ -49,13 +45,9 @@ type
   protected
   public
     constructor Create;
-
     procedure EditKeyDown(Key, ScanCode: Word; Shift: TShiftState; Msg: TMsg; var Handled: Boolean);
     procedure EditChar(Key, ScanCode: Word; Shift: TShiftState; Msg: TMsg; var Handled: Boolean);
-
-
     property Count: Integer read GetCount;
-
     // Are we in insert mode?
     property InsertMode: Boolean read FInsertMode write FInsertMode;
     // Are the vi bindings active?
@@ -174,9 +166,6 @@ var
       InsertMode := True;
     end;
   end;
-
-
-
 begin
   if not Active then Exit;
 
@@ -261,8 +250,16 @@ begin
           end;
         'c':
           begin
-            FInChange := True;
-            FEditCount := count;
+            if FInChange then
+            begin
+              EditPosition.MoveBOL;
+              Self.EditChar(Word('$'), ScanCode, Shift, Msg, Handled);
+            end
+            else
+            begin
+              FInChange := True;
+              FEditCount := count;
+            end;
           end;
         'C':
           begin
@@ -367,6 +364,21 @@ begin
             GetTopMostEditView.Buffer.BufferOptions.InsertMode := False;
             InsertMode := True;
           end;
+        's':
+          begin
+            EditPosition.Delete(1);
+            SwitchToInsertModeOrDoPreviousAction;
+          end;
+        'S':
+          begin
+            FInChange := True;
+            EditPosition.MoveBOL;
+            Self.EditChar(Word('$'), ScanCode, Shift, Msg, Handled);
+          end;
+        'u':
+          begin
+            GetEditBuffer.Undo;
+          end;
         'x':
           begin
             SavePreviousAction;
@@ -435,10 +447,6 @@ begin
 end;
 
 procedure TViBindings.EditKeyDown(Key, ScanCode: Word; Shift: TShiftState; Msg: TMsg; var Handled: Boolean);
-var
-  c: WideChar;
-  ToAsciiResult: Integer;
-  keyState: TKeyboardState;
 begin
   if not Active then Exit;
 
@@ -451,19 +459,6 @@ begin
       Handled := True;
       Self.FPreviousAction.FInsertText := FInsertText;
       FInsertText := '';
-    end
-    else if not ((ssCtrl in Shift) or (ssAlt in Shift)) then
-    begin
-      GetKeyboardState(keyState);
-      ToAsciiResult := ToAscii(Key, ScanCode, keystate, @c, 0);
-      // XXX do we handle the case of two characters in the buffer?
-      if (ToAsciiResult > 0) then
-      begin
-        if (Key = VK_BACK) then
-          SetLength(FInsertText, Length(FInsertText) - 1)
-        else
-          FInsertText := FInsertText + c;
-      end;
     end;
   end
   else
