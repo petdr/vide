@@ -30,5 +30,5 @@ Updating to a new version of Delphi
 ===================================
 
 - Create a DLL project and name it VIDE_DELPHIVER.dll
-- Edit runtime packages and add designide 
+- Edit runtime packages and add designide (No longer required with Berlin and later).
 - Check Link runtime packages
