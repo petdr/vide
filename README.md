@@ -5,6 +5,11 @@ VI for Delphi IDE
 
 This package provides a very minimal set of key bindings to allow one to do some vi actions inside the delphi editor.
 
+Alternatives
+============
+
+[Vi4D](https://github.com/AntoineGS/Vi4D) is a more full featured vi keybinding.
+
 Installation
 ============
 
